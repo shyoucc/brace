@@ -2,32 +2,55 @@
 
 const publishSubscribe = {}
 
-publishSubscribe.event = {
-    clientList: [],
-    listen: function(key, fn){
-        if (!this.clientList[key]) {
-            this.clientList[key] = []
+publishSubscribe.event = (function(){
+    let clientList = {}
+
+    let listen = function(key, fn){
+        if (!clientList[key]) {
+            clientList[key] = []
         }
-        this.clientList[key].push(fn)
-    },
-    trigger: function(){
+        clientList[key].push(fn)
+    }
+
+    let trigger = function(){
         let key = Array.prototype.shift.call(arguments)
-        let fns = this.clientList[key]
+        let fns = clientList[key]
 
         if (fns.length === 0 || !fns) {
             return
         }
 
-        for (let i = 0; i < fns.length; i++) {
-            let fn = fns[i]
+        for(var i = 0, fn; fn = fns[i++];){
             fn.apply(this, arguments)
         }
-
-        // for(var i = 0, fn; fn = fns[i++]){
-        //     fn.appay(this, arguments)
-        // }
     }
-}
+
+    let remove = function(key, fn){
+        let fns = clientList[key]
+        // 没有人订阅 直接返回
+        if (!fns) {
+            return false
+        }
+        if (!fn) {
+            // 如果不传入具体回调函数，表示取消key对应的所有订阅
+            fns && (fns.length = 0)
+        } else {
+            for (let i = fns.length - 1 ; i >= 0; i--) {
+                let _fn = fns[i]
+                if (_fn === fn) {
+                    fns.splice(i, 1)
+                }
+            }
+        }
+    }
+
+    return {
+        listen,
+        trigger,
+        remove
+    }
+
+})()
 
 // 对象动态安装 发布-订阅功能
 publishSubscribe.installEvent = function(obj){
@@ -49,6 +72,8 @@ seller.listen('fruit100', function(price){
 seller.listen('fruit200', function(price){
     console.log('price:', price)
 })
+
+seller.remove('fruit200')
 
 // 发布
 seller.trigger('fruit100', 20)
