@@ -20,7 +20,7 @@ publishSubscribe.event = {
 
         for (let i = 0; i < fns.length; i++) {
             let fn = fns[i]
-            fn.appay(this, arguments)
+            fn.apply(this, arguments)
         }
 
         // for(var i = 0, fn; fn = fns[i++]){
@@ -31,7 +31,8 @@ publishSubscribe.event = {
 
 // 对象动态安装 发布-订阅功能
 publishSubscribe.installEvent = function(obj){
-    for(i in event){
+    let event = this.event
+    for(let i in event){
         obj[i] = event[i]
     }
 }
@@ -39,7 +40,7 @@ publishSubscribe.installEvent = function(obj){
 // *********************line*********************//
 
 let seller = {}
-installEvent(seller)
+publishSubscribe.installEvent(seller)
 // 订阅
 seller.listen('fruit100', function(price){
     console.log('price:', price)
