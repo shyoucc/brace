@@ -1,4 +1,8 @@
-// 发布订阅模式
+/*
+
+@发布订阅模式
+
+*/
 
 const publishSubscribe = {}
 
@@ -62,6 +66,10 @@ publishSubscribe.installEvent = function(obj){
 
 // *********************line*********************//
 
+function test(price){
+    console.log('price:', price)
+}
+
 let seller = {}
 publishSubscribe.installEvent(seller)
 // 订阅
@@ -69,11 +77,9 @@ seller.listen('fruit100', function(price){
     console.log('price:', price)
 })
 
-seller.listen('fruit200', function(price){
-    console.log('price:', price)
-})
+seller.listen('fruit200', test)
 
-seller.remove('fruit200')
+seller.remove('fruit200', test)
 
 // 发布
 seller.trigger('fruit100', 20)
